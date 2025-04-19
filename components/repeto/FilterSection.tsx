@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
+import filtersData from '@/data/filters.json';
 
 interface FilterOption {
   title: string;
@@ -13,96 +14,10 @@ interface FilterSectionProps {
 
 export default function FilterSection({ onFilterSubmit, onClearFilters }: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [filters] = useState<FilterOption[]>(filtersData); 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, Set<string>>>({});
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
 
-  const filters: FilterOption[] = [
-    {
-      title: "Project Type",
-      options: ["Final Year Project", "Mini Project", "Research Project", "Personal Project", "Others"]
-    },
-    {
-      title: "Department",
-      options: ["CSE", "IT", "EEE", "ECE", "MECH", "CIVIL", "Others"]
-    },
-    {
-      title: "Year of Submission",
-      options: ["2025", "2024", "2023", "2022", "2021"]
-    },
-    {
-      title: "Domain",
-      options: [
-        "Other",
-        "Web Development",
-        "Mobile App Development (Android & iOS)",
-        "Artificial Intelligence (AI) & Machine Learning (ML)",
-        "Data Science & Big Data Analytics",
-        "Cybersecurity & Ethical Hacking",
-        "Blockchain & Cryptocurrency",
-        "Cloud Computing & DevOps",
-        "Game Development & AR/VR",
-        "Internet of Things (IoT)",
-        "Natural Language Processing (NLP)",
-        "Database Management & Data Warehousing",
-        "Quantum Computing",
-        "Software Testing & Automation",
-        "Full Stack Development (MERN, MEAN, etc.)",
-        "UI/UX & Human-Computer Interaction",
-        "Computer Networks & Network Security",
-        "Augmented Reality (AR) & Virtual Reality (VR)",
-        "E-commerce & CMS Development",
-        "No-Code & Low-Code Development",
-        "Cloud Security & Serverless Computing",
-        "DevOps & Site Reliability Engineering (SRE)",
-        "Edge Computing & Distributed Systems",
-        "IT Infrastructure & System Administration",
-        "Data Engineering & Business Intelligence",
-        "IT Governance & Compliance",
-        "Structural Engineering & Earthquake-Resistant Design",
-        "Transportation & Highway Engineering",
-        "Geotechnical Engineering & Soil Mechanics",
-        "Smart Cities & Urban Planning",
-        "Sustainable & Green Building Technology",
-        "Hydraulics & Water Resource Engineering",
-        "Construction Management & Project Planning",
-        "Environmental Engineering & Waste Management",
-        "Building Information Modeling (BIM)",
-        "Disaster Management & Risk Analysis",
-        "Bridge & Tunnel Engineering",
-        "Surveying & Remote Sensing (GIS & GPS)",
-        "VLSI & Chip Design",
-        "Embedded Systems & Microcontrollers",
-        "Wireless Communication (5G, LTE, Satellite)",
-        "Signal & Image Processing",
-        "Optical Fiber & Photonics",
-        "Digital & Analog Circuit Design",
-        "Antenna & RF Engineering",
-        "Smart Sensors & Wearable Technology",
-        "Audio & Speech Processing",
-        "Biomedical Electronics & Bionics",
-        "MEMS & Nanoelectronics",
-        "Power Systems & Smart Grids",
-        "Renewable Energy (Solar, Wind, Hydro)",
-        "Control Systems & Automation",
-        "Robotics & Mechatronics",
-        "Electric Vehicles (EV) & Battery Technologies",
-        "High Voltage Engineering",
-        "Energy Management & Conservation",
-        "Industrial Instrumentation & Process Control",
-        "Electrical Machines & Drives",
-        "Smart Home & Building Automation",
-        "CAD, CAM & 3D Printing",
-        "Automotive & Aerospace Engineering",
-        "Thermodynamics & Fluid Mechanics",
-        "Mechatronics & Smart Manufacturing",
-        "HVAC & Refrigeration Systems",
-        "Material Science & Composites",
-        "Renewable Energy in Mechanical Systems",
-        "Computational Fluid Dynamics (CFD)",
-        "Finite Element Analysis (FEA)"
-      ]
-    }
-  ];
 
   const toggleDropdown = (filterTitle: string) => {
     setOpenDropdowns(prev => ({
