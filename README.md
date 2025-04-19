@@ -1,6 +1,6 @@
 # ProjectArchive
 
-**ProjectArchive** is a static website designed for students at  Enginerrring colleg to showcase their projects. This platform provides students with visibility, helps them secure internships, and allows recruiters to assess their potential.
+**ProjectArchive** is a static website designed for students at  **Engineering College** to showcase their projects. This platform provides students with visibility, helps them secure internships, and allows recruiters to assess their potential.
 
 ---
 
@@ -56,7 +56,7 @@ Absolutely! You can easily **reuse and customize** this project for your own ins
    - To **add**, **edit**, or **delete** project details, make changes directly in this file.
 
 5. **Deploy with GitHub Pages**  
-   Once you're done customizing, deploy it using GitHub Pages:
+   Once you're done customizing, deploy it using GitHub Action:
    - Go to your repo settings → Pages → select the main branch and `/ (root)` folder.
 
 ---
