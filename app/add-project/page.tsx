@@ -1,111 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Save, XCircle } from "lucide-react";
 import Link from "next/link";
 
-const submissionYears = [2025, 2024, 2023, 2022, 2021];
-const projectTypes = [
-  "Final Year Project",
-  "Mini Project",
-  "Research Project",
-  "Personal Project",
-  "Others"
-];
-const departments = ["CSE", "IT", "ECE", "EEE", "MECH", "CIVIL", "Other"];
-const availableDomains = [
-  "Other",
-  "Web Development",
-  "Mobile App Development (Android & iOS)",
-  "Artificial Intelligence (AI) & Machine Learning (ML)",
-  "Data Science & Big Data Analytics",
-  "Cybersecurity & Ethical Hacking",
-  "Blockchain & Cryptocurrency",
-  "Cloud Computing & DevOps",
-  "Game Development & AR/VR",
-  "Internet of Things (IoT)",
-  "Natural Language Processing (NLP)",
-  "Database Management & Data Warehousing",
-  "Quantum Computing",
-  "Software Testing & Automation",
-  "Full Stack Development (MERN, MEAN, etc.)",
-  "UI/UX & Human-Computer Interaction",
-  "Computer Networks & Network Security",
-  "Augmented Reality (AR) & Virtual Reality (VR)",
-  "E-commerce & CMS Development",
-  "No-Code & Low-Code Development",
-  "Cloud Security & Serverless Computing",
-  "DevOps & Site Reliability Engineering (SRE)",
-  "Edge Computing & Distributed Systems",
-  "IT Infrastructure & System Administration",
-  "Data Engineering & Business Intelligence",
-  "IT Governance & Compliance",
-  "Structural Engineering & Earthquake-Resistant Design",
-  "Transportation & Highway Engineering",
-  "Geotechnical Engineering & Soil Mechanics",
-  "Smart Cities & Urban Planning",
-  "Sustainable & Green Building Technology",
-  "Hydraulics & Water Resource Engineering",
-  "Construction Management & Project Planning",
-  "Environmental Engineering & Waste Management",
-  "Building Information Modeling (BIM)",
-  "Disaster Management & Risk Analysis",
-  "Bridge & Tunnel Engineering",
-  "Surveying & Remote Sensing (GIS & GPS)",
-  "VLSI & Chip Design",
-  "Embedded Systems & Microcontrollers",
-  "Wireless Communication (5G, LTE, Satellite)",
-  "Signal & Image Processing",
-  "Optical Fiber & Photonics",
-  "Digital & Analog Circuit Design",
-  "Antenna & RF Engineering",
-  "Smart Sensors & Wearable Technology",
-  "Audio & Speech Processing",
-  "Biomedical Electronics & Bionics",
-  "MEMS & Nanoelectronics",
-  "Power Systems & Smart Grids",
-  "Renewable Energy (Solar, Wind, Hydro)",
-  "Control Systems & Automation",
-  "Robotics & Mechatronics",
-  "Electric Vehicles (EV) & Battery Technologies",
-  "High Voltage Engineering",
-  "Energy Management & Conservation",
-  "Industrial Instrumentation & Process Control",
-  "Electrical Machines & Drives",
-  "Smart Home & Building Automation",
-  "CAD, CAM & 3D Printing",
-  "Automotive & Aerospace Engineering",
-  "Thermodynamics & Fluid Mechanics",
-  "Mechatronics & Smart Manufacturing",
-  "HVAC & Refrigeration Systems",
-  "Material Science & Composites",
-  "Renewable Energy in Mechanical Systems",
-  "Computational Fluid Dynamics (CFD)",
-  "Finite Element Analysis (FEA)"
-];
+interface CategoryOption { // Define interfaces for fetched data
+  optionId: number;
+  optionName: string;
+}
+
+interface Category {
+  categoryId: number;
+  categoryName: string;
+  options: CategoryOption[];
+}
 
 const AddProjectPage = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data: Category[] = await res.json();
+        setCategories(data);
+      } catch (e: any) {
+        setErrorCategories(e.message);
+        console.error("Failed to fetch categories for form:", e);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const initialFormState = {
     projectName: "",
     projectDescription: "",
-    yearOfSubmission: "2025",
-    projectType: "Personal Project",
-    department: "",
-    domain: "Web Development",
-    customDomain: "",
     projectLink: "",
-    members: [{ name: "", linkedin: "" }]
+    createdAt: "",
+    members: [{ name: "", linkedin: "" }],
+    selectedCategoryOptions: {} as Record<string, string>, // Map category name to selected option name
+    customDomain: "", // Keep customDomain separate if 'Domain' is 'Other'
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const [showPopup, setShowPopup] = useState(false); // State for pop-up visibility
-  const [loading, setLoading] = useState(false); // Loading state to prevent duplicate submissions
+  const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Set initial default values for dropdowns after categories are fetched
+    if (!loadingCategories && categories.length > 0) {
+      setFormData(prev => {
+        const newSelectedOptions: Record<string, string> = {};
+        categories.forEach(cat => {
+          if (cat.options.length > 0) {
+            newSelectedOptions[cat.categoryName] = cat.options[0].optionName;
+          }
+        });
+        return {
+          ...prev,
+          selectedCategoryOptions: newSelectedOptions,
+        };
+      });
+    }
+  }, [loadingCategories, categories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return; // Prevent multiple submissions
+    if (loading) return; 
 
-    // Ensure at least one member has a name
     const hasValidMember = formData.members.some(
       (member) => member.name.trim() !== ""
     );
@@ -114,37 +83,47 @@ const AddProjectPage = () => {
       return;
     }
 
-    setLoading(true); // Begin submission
+    setLoading(true);
 
-    // Filter out empty members
     const filteredMembers = formData.members.filter(
       (member) => member.name.trim() !== ""
     );
 
+    // Prepare category options for backend
+    const projectCategoryOptions: { categoryName: string; optionName: string }[] = Object.entries(formData.selectedCategoryOptions).map(([categoryName, optionName]) => ({
+      categoryName,
+      optionName: categoryName === 'Domain' && optionName === 'Other' ? formData.customDomain : optionName // Use customDomain if 'Other' domain is selected
+    }));
+
     const projectData = {
-      ...formData,
+      projectName: formData.projectName,
+      projectDescription: formData.projectDescription,
+      projectLink: formData.projectLink,
+      createdAt: new Date().toISOString(),
       members: filteredMembers,
-      createdAt: new Date().toISOString()
+      projectCategoryOptions, // Send as a generic array of category options
+      customDomain: formData.selectedCategoryOptions['Domain'] === 'Other' ? formData.customDomain : undefined, // Send customDomain separately
     };
 
     try {
-      const response = await fetch("/api/saveProject", {
+      const response = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(projectData)
       });
 
       if (response.ok) {
-        setFormData(initialFormState);
-        setShowPopup(true); // Show the congratulatory pop-up
-        setTimeout(() => setShowPopup(false), 3000); // Hide it after 3 seconds
+        localStorage.removeItem('cachedProjects'); // Invalidate projects cache
+        setFormData(initialFormState); // Reset form
+        setShowPopup(true);
+        setTimeout(() => setShowPopup(false), 3000);
       } else {
         alert("Failed to save project.");
       }
     } catch (error) {
       console.error("Error saving project:", error);
     } finally {
-      setLoading(false); // End submission
+      setLoading(false);
     }
   };
 
@@ -154,7 +133,18 @@ const AddProjectPage = () => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name.startsWith("category-")) {
+      const categoryName = name.replace("category-", "");
+      setFormData((prev) => ({
+        ...prev,
+        selectedCategoryOptions: {
+          ...prev.selectedCategoryOptions,
+          [categoryName]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleMemberChange = (index: number, field: string, value: string) => {
@@ -178,6 +168,14 @@ const AddProjectPage = () => {
   const clearForm = () => {
     setFormData(initialFormState);
   };
+
+  if (loadingCategories) {
+    return <div className="text-center py-8">Loading form data...</div>;
+  }
+
+  if (errorCategories) {
+    return <div className="text-center py-8 text-red-500">Error loading form data: {errorCategories}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -234,68 +232,40 @@ const AddProjectPage = () => {
             onChange={handleChange}
             value={formData.projectDescription}
           />
-          <select
-            name="yearOfSubmission"
-            required
-            className="w-full px-4 py-2 border rounded-lg"
-            onChange={handleChange}
-            value={formData.yearOfSubmission}
-          >
-            {submissionYears.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-          <select
-            name="projectType"
-            required
-            className="w-full px-4 py-2 border rounded-lg"
-            onChange={handleChange}
-            value={formData.projectType}
-          >
-            {projectTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-          <select
-            name="department"
-            required
-            className="w-full px-4 py-2 border rounded-lg"
-            onChange={handleChange}
-            value={formData.department}
-          >
-            {departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
-          <select
-            name="domain"
-            required
-            className="w-full px-4 py-2 border rounded-lg"
-            onChange={handleChange}
-            value={formData.domain}
-          >
-            {availableDomains.map((domain) => (
-              <option key={domain} value={domain}>
-                {domain}
-              </option>
-            ))}
-          </select>
-          {formData.domain === "Other" && (
-            <input
-              type="text"
-              name="customDomain"
-              className="w-full px-4 py-2 border rounded-lg"
-              placeholder="Enter custom domain"
-              onChange={handleChange}
-              value={formData.customDomain}
-            />
-          )}
+          
+          {/* Dynamic Category Selects */}
+          {categories.length > 0 && categories.map(category => (
+            <div key={category.categoryId} className="mb-4">
+              <label htmlFor={`category-${category.categoryName}`} className="block text-sm font-medium text-gray-700">
+                {category.categoryName}
+              </label>
+              <select
+                id={`category-${category.categoryName}`}
+                name={`category-${category.categoryName}`}
+                required
+                className="w-full px-4 py-2 border rounded-lg"
+                onChange={handleChange}
+                value={formData.selectedCategoryOptions[category.categoryName] || ''}
+              >
+                {category.options.map((option) => (
+                  <option key={option.optionId} value={option.optionName}>
+                    {option.optionName}
+                  </option>
+                ))}
+              </select>
+              {category.categoryName === "Domain" && formData.selectedCategoryOptions["Domain"] === "Other" && (
+                <input
+                  type="text"
+                  name="customDomain"
+                  className="mt-2 w-full px-4 py-2 border rounded-lg"
+                  placeholder="Enter custom domain"
+                  onChange={handleChange}
+                  value={formData.customDomain}
+                />
+              )}
+            </div>
+          ))}
+
           <input
             type="url"
             name="projectLink"

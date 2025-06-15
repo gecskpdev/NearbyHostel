@@ -6,23 +6,33 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:push": "drizzle-kit push",
+    "drizzle:studio": "drizzle-kit studio",
+    "drizzle:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.40.1",
     "firebase": "^11.3.1",
     "firebase-admin": "^13.2.0",
     "framer-motion": "^12.4.3",
     "lucide-react": "^0.469.0",
     "next": "^15.1.4",
+    "pg": "^8.16.0",
+    "postgres": "^3.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwindcss-textshadow": "^2.1.3"
+    "tailwindcss-textshadow": "^2.1.3",
+    "tsx": "^4.20.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "20.17.19",
+    "@types/node": "^20.17.19",
+    "@types/pg": "^8.15.4",
     "@types/react": "19.0.8",
     "@types/react-dom": "^19",
     "eslint": "^9",

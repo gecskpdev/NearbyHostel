@@ -14,6 +14,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     setExpanded(!expanded);
   };
 
+  // Helper to find category option by category name
+  const getCategoryOption = (categoryName: string) => {
+    return project.categories?.find(cat => cat.categoryName === categoryName)?.optionName;
+  };
+
+  const yearOfSubmission = getCategoryOption("Year of Submission");
+  const projectType = getCategoryOption("Project Type");
+  const domain = getCategoryOption("Domain");
+
   return (
     <div 
       className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform ${expanded ? "scale-105" : "hover:-translate-y-1"}`}
@@ -48,21 +57,21 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               <CalendarDays className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-gray-500 text-xs">Year</p>
-                <p className="text-gray-800 font-medium">{project.yearOfSubmission}</p>
+                <p className="text-gray-800 font-medium">{yearOfSubmission}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 group">
               <WalletCards className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-gray-500 text-xs">Project Type</p>
-                <p className="text-gray-800 font-medium">{project.projectType}</p>
+                <p className="text-gray-800 font-medium">{projectType}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 group">
               <Users className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-gray-500 text-xs">Domain</p>
-                <p className="text-gray-800 font-medium">{project.customDomain || project.domain}</p>
+                <p className="text-gray-800 font-medium">{domain === 'Other' ? project.customDomain || 'Other' : domain}</p>
               </div>
             </div>
           </div>

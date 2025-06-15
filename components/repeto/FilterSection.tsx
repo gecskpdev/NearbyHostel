@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
-import filtersData from '@/data/filters.json';
 
 interface FilterOption {
   title: string;
@@ -14,10 +13,35 @@ interface FilterSectionProps {
 
 export default function FilterSection({ onFilterSubmit, onClearFilters }: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filters] = useState<FilterOption[]>(filtersData); 
+  const [filters, setFilters] = useState<FilterOption[]>([]); 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, Set<string>>>({});
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetchFilterOptions();
+  }, []);
+
+  const fetchFilterOptions = async () => {
+    try {
+      const res = await fetch('/api/categories'); // Assuming this endpoint provides categories and their options
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      const formattedFilters: FilterOption[] = data.map((category: any) => ({
+        title: category.categoryName,
+        options: category.options.map((option: any) => option.optionName),
+      }));
+      setFilters(formattedFilters);
+    } catch (e: any) {
+      setError(e.message);
+      console.error("Failed to fetch filter options:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleDropdown = (filterTitle: string) => {
     setOpenDropdowns(prev => ({
@@ -66,6 +90,22 @@ export default function FilterSection({ onFilterSubmit, onClearFilters }: Filter
     (count, set) => count + set.size,
     0
   );
+
+  if (loading) {
+    return (
+      <div className="p-4 space-y-4 w-64 bg-white">
+        <div>Loading filters...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 space-y-4 w-64 bg-white text-red-500">
+        <div>Error: {error}</div>
+      </div>
+    );
+  }
 
   const FilterContent = () => (
     <div className="space-y-4 w-full">

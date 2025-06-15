@@ -7,8 +7,8 @@ export default function TabSection({ activeTab, onTabChange }: TabSectionProps) 
   const tabs = ["All", "Latest", "Oldest", "This Week",];
   
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="flex space-x-6 p-4 overflow-x-auto justify-evenly">
+    <div className="bg-white rounded-lg shadow w-full">
+      <div className="flex space-x-6 p-4 overflow-x-auto w-full justify-evenly">
         {tabs.map((tab) => (
           <button
             key={tab}
