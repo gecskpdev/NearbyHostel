@@ -1,14 +1,16 @@
-# ProjectArchive
+# Hostel Management System
 
-**ProjectArchive** is a static website designed for students at  **Engineering College** to showcase their projects. This platform provides students with visibility, helps them secure internships, and allows recruiters to assess their potential.
+**Hostel Management System** is a modern web application designed to streamline the management of hostels, categories, comments, and user moderation for educational institutions or organizations. This platform provides robust admin tools, user access control, and a clean, accessible UI for efficient hostel administration.
 
 ---
 
 ## 🚀 Features
-- 📌 **Centralized Repository** – A dedicated space to store and showcase student projects.
-- 🌍 **Industry Exposure** – Helps students gain recognition and attract recruiters.
-- 🔍 **Recruitment Support** – Enables alumni and hiring managers to find talented students.
-- 💡 **Inspiration & Collaboration** – Encourages students to innovate and collaborate on projects.
+- 🏠 **Hostel Management** – Add, edit, and manage hostel details including name, address, and price.
+- 🗂️ **Category Management** – Create and organize hostel categories for better filtering and search.
+- 📝 **Comment Moderation** – Admins can view, edit, report, and block user comments for a safe environment.
+- 🚫 **User Blocking & Reporting** – Block users or report inappropriate comments, with in-app notifications.
+- 🔒 **Access Control** – Secure admin and superadmin roles with persistent authentication.
+- 💡 **Modern UI** – Built with Shadcn UI components for a clean, responsive, and accessible experience.
 
 ---
 
@@ -18,52 +20,46 @@
 ---
 
 ## 🛠️ Tech Stack
-- **Frontend:** HTML, CSS, JavaScript
-- **Hosting:** GitHub Pages
+- **Frontend:** Next.js, React, TypeScript, Tailwind CSS, Shadcn UI
+- **Backend:** Next.js API Routes, Firebase Firestore
+- **Email/Notifications:** (Email notifications have been removed; in-app notifications only)
+- **Authentication:** Firebase Auth
 
 ---
 
-## 👨‍💻 Team Members
-- **Shadil AM**  
-- **Sorraj**  
-- **Abhijith**  
-- **Abhiram**
+## 👨‍💻 Author
+This project was designed and developed solely by **Sooraj Krishna K P**.
 
 ---
 
-## 🏫 Want to Use This for Your Own College?
+## 🏫 Want to Use This for Your Own Hostel or Institution?
 
-Absolutely! You can easily **reuse and customize** this project for your own institution or student community:
+Absolutely! You can easily **reuse and customize** this project for your own hostel or organization:
 
 1. **Fork this repository**  
    This lets you receive any future updates while keeping your own customizations.
 
 2. **Clone your fork locally**  
    ```bash
-   git clone https://github.com/yourusername/ProjectArchive.git
+   git clone https://github.com/Sooraj-krishna/Nearby_hostels.git
    ```
 
 3. **Update Branding**  
    - Change the **name in the loading screen and navbar** to match your institution.  
      This can be done in the **`components/` folder**.
-   - Look for `Loading.js`, `Navbar.js`, or similarly named files.
+   - Look for `loadingScrenn.tsx`, `Navbar.tsx`, or similarly named files.
 
-4. **Edit Projects Data**  
-   - All project information is stored in:  
-     ```
-     data/project.json
-     ```
-   - To **add**, **edit**, or **delete** project details, make changes directly in this file.
+4. **Edit Hostel Data**  
+   - All hostel and category information is managed via the admin panel. No need to edit JSON files directly.
 
-5. **Deploy with GitHub Pages**  
-   Once you're done customizing, deploy it using GitHub Action:
-   - Go to your repo settings → Pages → select the main branch and `/ (root)` folder.
+5. **Deploy**  
+   Deploy using Vercel, Netlify, or your preferred hosting provider.
 
 ---
 
 ## 📜 How to Contribute
 1. Fork the repository.
-2. Clone it: `git clone https://github.com/yourusername/ProjectArchive.git`
+2. Clone it: `git clone https://github.com/Sooraj-krishna/Nearby_hostels.git`
 3. Create a new branch: `git checkout -b feature-name`
 4. Make your changes and commit: `git commit -m 'Your Message'`
 5. Push changes: `git push origin feature-name`
@@ -73,10 +69,9 @@ Absolutely! You can easily **reuse and customize** this project for your own ins
 
 ## 📩 Contact
 For any queries, feel free to reach out:  
-- 📧 Email: [shadilrayyan2@gmail.com]  
-- 🌐 Website: [ProjectArchive](https://codecompasss.github.io/project_archive/)
+- 📧 Email: [soorajkrishnakp2002@gmail.com]
 
 ---
 
-✨ *Empowering students by showcasing their projects!*  
+✨ *Empowering hostel management with modern web technology!*  
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import TableSkeleton from '@/components/repeto/TableSkeleton';
+import TableSkeleton from '@/components/main/TableSkeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProjectCardSkeleton: React.FC = () => {
+const HostelCardSkeleton: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
       <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
@@ -28,4 +28,4 @@ const ProjectCardSkeleton: React.FC = () => {
   );
 };
 
-export default ProjectCardSkeleton; 
+export default HostelCardSkeleton; 

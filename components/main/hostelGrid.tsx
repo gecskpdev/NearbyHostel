@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import HostelCard from "./ProjectCard"; // We'll rename this file later
+import HostelCard from "./hostelCard"; // We'll rename this file later
 import { Hostel } from "@/types/project";
-import ProjectCardSkeleton from './ProjectCardSkeleton'; // We'll rename this file later
+import ProjectCardSkeleton from './hostelCardSkeleton'; // We'll rename this file later
 
 interface HostelGridProps {
   activeTab: string;

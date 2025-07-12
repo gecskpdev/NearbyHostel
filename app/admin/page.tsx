@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import HostelGrid from '@/components/repeto/ProjectGrid';
-import FilterSection from '@/components/repeto/FilterSection';
-import TabSection from '@/components/repeto/TabSection';
+import HostelGrid from '@/components/main/hostelGrid';
+import FilterSection from '@/components/main/FilterSection';
+import TabSection from '@/components/main/TabSection';
 import LoadingScreen from "@/components/loadingScrenn";
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
