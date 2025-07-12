@@ -2,6 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import TableSkeleton from '@/components/repeto/TableSkeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { auth, firestore } from '@/lib/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface CategoryOption {
   optionId?: number;
@@ -23,6 +30,26 @@ export default function ManageCategoriesPage() {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [categoryToDeleteId, setCategoryToDeleteId] = useState<number | null>(null);
   const [deleteErrorType, setDeleteErrorType] = useState<"none" | "foreignKeyBlocked" | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [loadingAccess, setLoadingAccess] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user?.email) {
+        const docRef = doc(firestore, "adminemail", user.email);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUserRole(docSnap.data().role);
+        } else {
+          setUserRole(null);
+        }
+      } else {
+        setUserRole(null);
+      }
+      setLoadingAccess(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     fetchCategories();
@@ -62,11 +89,13 @@ export default function ManageCategoriesPage() {
 
   const handleAddCategory = () => {
     setCurrentCategory({ categoryName: '', options: [] });
+    setError(null);
     setIsModalOpen(true);
   };
 
   const handleEditCategory = (category: Category) => {
     setCurrentCategory({ ...category });
+    setError(null);
     setIsModalOpen(true);
   };
 
@@ -96,7 +125,7 @@ export default function ManageCategoriesPage() {
         // Check for specific foreign key constraint error (based on your console output)
         if (errorMessage.includes('violates foreign key constraint') || (errorCode === '23503')) {
           setDeleteErrorType("foreignKeyBlocked");
-          setError("This deletion affects the database, because this category is used in some projects. If you want to delete the category, remove the category from the projects and then delete the category."); // Set the specific error message
+          setError("This deletion affects the database, because this category is used in some hostels. If you want to delete the category, remove the category from the hostels and then delete the category."); // Set the specific error message
           return; // Prevent further execution, keep modal open
         } else {
           throw new Error(`HTTP error! status: ${res.status} - ${errorMessage}`);
@@ -196,6 +225,11 @@ export default function ManageCategoriesPage() {
     });
   };
 
+  if (loadingAccess) return <div className="text-center py-8">Checking admin access...</div>;
+  if (userRole !== 'admin' && userRole !== 'superadmin') {
+    return <div className="text-red-600 text-center py-8">Access denied. Admins or Super Admins only.</div>;
+  }
+
   if (loading) return <TableSkeleton />;
   if (error) return <div>Error: {error}</div>;
 
@@ -212,22 +246,22 @@ export default function ManageCategoriesPage() {
         </button>
 
         <div className="bg-white shadow-md rounded-lg p-4 md:p-6 overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+          <Table className="min-w-full divide-y divide-gray-200">
+            <TableHeader className="bg-gray-50">
+              <TableRow>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-white divide-y divide-gray-200">
               {categories.map((category) => (
-                <tr key={category.categoryId}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.categoryName}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 overflow-hidden text-ellipsis">
+                <TableRow key={category.categoryId}>
+                  <TableCell className="px-6 py-4 text-sm font-medium text-gray-900">{category.categoryName}</TableCell>
+                  <TableCell className="px-6 py-4 text-sm text-gray-500 overflow-hidden text-ellipsis">
                     {category.options.map(o => o.optionName).join(', ')}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium">
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right text-sm font-medium">
                     <button
                       onClick={() => handleEditCategory(category)}
                       className="text-indigo-600 hover:text-indigo-900 mr-4"
@@ -240,112 +274,114 @@ export default function ManageCategoriesPage() {
                     >
                       Delete
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center p-4">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-              <h2 className="text-2xl font-bold mb-4">{currentCategory?.categoryId ? 'Edit Category' : 'Add New Category'}</h2>
-              <form onSubmit={handleSaveCategory}>
-                <div className="mb-4">
-                  <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700">Category Name</label>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold mb-4">{currentCategory?.categoryId ? 'Edit Category' : 'Add New Category'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSaveCategory}>
+              {/* Error message display */}
+              {error && <div className="text-red-600 text-sm mb-4">{error}</div>}
+              <div className="mb-4">
+                <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700">Category Name</label>
+                <input
+                  type="text"
+                  id="categoryName"
+                  name="categoryName"
+                  value={currentCategory?.categoryName || ''}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+
+              <h3 className="text-lg font-bold mb-2">Options</h3>
+              {currentCategory?.options.map((option, index) => (
+                <div key={index} className="flex flex-col sm:flex-row mb-2 items-center w-full">
                   <input
                     type="text"
-                    id="categoryName"
-                    name="categoryName"
-                    value={currentCategory?.categoryName || ''}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    name="optionName"
+                    value={option.optionName || ''}
+                    onChange={(e) => handleOptionChange(index, e)}
+                    className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 mr-2 w-full mb-2 sm:mb-0"
+                    placeholder="Option Name"
                     required
                   />
-                </div>
-
-                <h3 className="text-lg font-bold mb-2">Options</h3>
-                {currentCategory?.options.map((option, index) => (
-                  <div key={index} className="flex flex-col sm:flex-row mb-2 items-center w-full">
-                    <input
-                      type="text"
-                      name="optionName"
-                      value={option.optionName || ''}
-                      onChange={(e) => handleOptionChange(index, e)}
-                      className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 mr-2 w-full mb-2 sm:mb-0"
-                      placeholder="Option Name"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveOption(index)}
-                      className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 w-full sm:w-auto"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleAddOption}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 mb-4 w-full sm:w-auto"
-                >
-                  Add Option
-                </button>
-
-                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 w-full sm:w-auto"
+                    onClick={() => handleRemoveOption(index)}
+                    className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 w-full sm:w-auto"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full sm:w-auto"
-                  >
-                    Save Category
+                    Remove
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        )}
+              ))}
+              <button
+                type="button"
+                onClick={handleAddOption}
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 mb-4 w-full sm:w-auto"
+              >
+                Add Option
+              </button>
 
-        {showDeleteConfirmModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center p-4">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-              <h2 className="text-2xl font-bold mb-4">
-                {deleteErrorType === "foreignKeyBlocked" ? "Deletion Blocked" : "Confirm Delete"}
-              </h2>
-              <p className="mb-4">
-                {deleteErrorType === "foreignKeyBlocked"
-                  ? error // Display the specific error message from state
-                  : "Are you sure you want to delete this category? This action cannot be undone."}
-              </p>
-              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+              <DialogFooter className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
                 <button
                   type="button"
-                  onClick={cancelDelete}
+                  onClick={() => setIsModalOpen(false)}
                   className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 w-full sm:w-auto"
                 >
                   Cancel
                 </button>
-                {deleteErrorType !== "foreignKeyBlocked" && ( // Only show Delete button if not blocked
-                  <button
-                    type="button"
-                    onClick={() => confirmDeleteCategory(false)} // Regular delete
-                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full sm:w-auto"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full sm:w-auto"
+                >
+                  Save Category
+                </button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showDeleteConfirmModal} onOpenChange={setShowDeleteConfirmModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold mb-4">
+                {deleteErrorType === "foreignKeyBlocked" ? "Deletion Blocked" : "Confirm Delete"}
+              </DialogTitle>
+            </DialogHeader>
+            <p className="mb-4">
+              {deleteErrorType === "foreignKeyBlocked"
+                ? error // Display the specific error message from state
+                : "Are you sure you want to delete this category? This action cannot be undone."}
+            </p>
+            <DialogFooter className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+              <button
+                type="button"
+                onClick={cancelDelete}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              {deleteErrorType !== "foreignKeyBlocked" && ( // Only show Delete button if not blocked
+                <button
+                  type="button"
+                  onClick={() => confirmDeleteCategory(false)} // Regular delete
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full sm:w-auto"
+                >
+                  Delete
+                </button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

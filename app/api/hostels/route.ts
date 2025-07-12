@@ -62,6 +62,96 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(finalHostels);
   } catch (error) {
     console.error('Error fetching hostels:', error);
+    
+    // Return sample data for testing when database is not connected
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      console.log('Database not connected, returning sample data for testing');
+      return NextResponse.json([
+        {
+          hostelId: 1,
+          hostelName: "Sample Hostel - Backpacker's Paradise",
+          hostelDescription: "A vibrant hostel in the heart of the city, perfect for budget travelers looking to meet fellow adventurers. Features a lively common room, free breakfast, and organized tours.",
+          location: "https://maps.google.com/?q=123+Main+St+City+Center",
+          address: "123 Main Street, City Center, 12345",
+          phoneNumber: "+1 555 123 4567",
+          email: "info@backpackersparadise.com",
+          website: "https://www.backpackersparadise.com",
+          priceRange: "$25-50",
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          categories: [
+            { categoryName: "Amenities", optionName: "Free WiFi" },
+            { categoryName: "Room Type", optionName: "Dormitory" },
+            { categoryName: "Location Type", optionName: "City Center" },
+            { categoryName: "Price Range", optionName: "Economy ($25-50)" },
+            { categoryName: "Atmosphere", optionName: "Party/Social" }
+          ],
+          images: [
+            {
+              imageId: 1,
+              imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+              imageType: "general",
+              isPrimary: true,
+              uploadedAt: new Date().toISOString()
+            }
+          ],
+          averageRating: 4.5,
+          totalRatings: 127,
+          comments: [
+            {
+              commentId: 1,
+              commentText: "Great atmosphere and friendly staff! Perfect for meeting other travelers.",
+              userName: "Sarah M.",
+              userEmail: "sarah@example.com",
+              isVerified: true,
+              createdAt: new Date().toISOString()
+            }
+          ]
+        },
+        {
+          hostelId: 2,
+          hostelName: "Mountain View Lodge",
+          hostelDescription: "Peaceful hostel with stunning mountain views. Perfect for nature lovers and those seeking a quiet retreat. Features hiking trails, garden, and cozy common areas.",
+          location: "https://maps.google.com/?q=456+Mountain+Rd+Scenic+View",
+          address: "456 Mountain Road, Scenic View, 67890",
+          phoneNumber: "+1 555 987 6543",
+          email: "hello@mountainviewlodge.com",
+          website: "https://www.mountainviewlodge.com",
+          priceRange: "$50-100",
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          categories: [
+            { categoryName: "Amenities", optionName: "Garden/Terrace" },
+            { categoryName: "Room Type", optionName: "Private Room" },
+            { categoryName: "Location Type", optionName: "Mountain View" },
+            { categoryName: "Price Range", optionName: "Mid-range ($50-100)" },
+            { categoryName: "Atmosphere", optionName: "Quiet/Relaxed" }
+          ],
+          images: [
+            {
+              imageId: 2,
+              imageUrl: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+              imageType: "general",
+              isPrimary: true,
+              uploadedAt: new Date().toISOString()
+            }
+          ],
+          averageRating: 4.8,
+          totalRatings: 89,
+          comments: [
+            {
+              commentId: 2,
+              commentText: "Absolutely beautiful location and very peaceful. Perfect for a relaxing getaway.",
+              userName: "Mike R.",
+              userEmail: "mike@example.com",
+              isVerified: true,
+              createdAt: new Date().toISOString()
+            }
+          ]
+        }
+      ]);
+    }
+    
     return NextResponse.json({ message: 'Failed to fetch hostels.' }, { status: 500 });
   }
 }

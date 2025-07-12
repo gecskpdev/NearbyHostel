@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import ProjectGrid from '@/components/repeto/ProjectGrid';
+import HostelGrid from '@/components/repeto/ProjectGrid';
 import FilterSection from '@/components/repeto/FilterSection';
 import TabSection from '@/components/repeto/TabSection';
 // import Footer from '@/components/Footer';
-import AddProjectFAB from '@/components/repeto/AddProjectFAB';
 // import LoadingScreen from "@/components/loadingScrenn";
 import Link from 'next/link';
 
@@ -14,7 +13,7 @@ import Link from 'next/link';
 export default function Home() {
   const [activeTab, setActiveTab] = useState("All");
   const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [refreshTrigger, setRefreshTrigger] = useState(false); // State to trigger project re-fetch
+  const [refreshTrigger, setRefreshTrigger] = useState(false); // State to trigger hostel re-fetch
   // const [loading, setLoading] = useState(true); // Track loading state
 
   useEffect(() => {
@@ -43,9 +42,8 @@ export default function Home() {
         <FilterSection onFilterSubmit={setFilters} onClearFilters={handleClearFilters} />
         <div className="flex-1 max-w-7xl px-4 py-6 space-y-8 w-full">
           <TabSection activeTab={activeTab} onTabChange={setActiveTab} />
-          <ProjectGrid activeTab={activeTab} filters={filters} refreshTrigger={refreshTrigger} />
+          <HostelGrid activeTab={activeTab} filters={filters} refreshTrigger={refreshTrigger} />
         </div>
-        <AddProjectFAB />
       </div>
       {/* <Footer /> */}
     </main>

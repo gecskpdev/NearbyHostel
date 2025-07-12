@@ -1,53 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProjectCard from "./ProjectCard";
-import { Project } from "@/types/project";
-import ProjectCardSkeleton from './ProjectCardSkeleton'; // Import the skeleton component
+import HostelCard from "./ProjectCard"; // We'll rename this file later
+import { Hostel } from "@/types/project";
+import ProjectCardSkeleton from './ProjectCardSkeleton'; // We'll rename this file later
 
-interface ProjectGridProps {
+interface HostelGridProps {
   activeTab: string;
   filters: Record<string, string[]>; // Accept selected filters
   refreshTrigger?: boolean; // New prop to trigger re-fetch
 }
 
-const ProjectGrid = ({ activeTab, filters, refreshTrigger }: ProjectGridProps) => {
-  const [projects, setProjects] = useState<Project[]>([]);
+const HostelGrid = ({ activeTab, filters, refreshTrigger }: HostelGridProps) => {
+  const [hostels, setHostels] = useState<Hostel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [allProjects, setAllProjects] = useState<Project[]>([]); // To store all fetched projects
+  const [allHostels, setAllHostels] = useState<Hostel[]>([]); // To store all fetched hostels
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchHostels = async () => {
       try {
         setLoading(true); // Set loading to true at the start of fetch
-        const res = await fetch('/api/projects');
+        const res = await fetch('/api/hostels');
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        const data: Project[] = await res.json();
+        const data: Hostel[] = await res.json();
         // Ensure all necessary fields are present or defaulted
-        const formattedData: Project[] = data.map((p) => ({
-          ...p,
-          createdAt: p.createdAt ?? new Date().toISOString(),
-          projectLink: p.projectLink ?? "",
-          members: p.members ?? [],
-          categories: p.categories ?? [], // Ensure categories array is present
+        const formattedData: Hostel[] = data.map((h) => ({
+          ...h,
+          createdAt: h.createdAt ?? new Date().toISOString(),
+          location: h.location ?? "",
+          images: h.images ?? [],
+          categories: h.categories ?? [], // Ensure categories array is present
+          comments: h.comments ?? [],
         }));
-        setAllProjects(formattedData);
+        setAllHostels(formattedData);
         setLoading(false);
       } catch (e: any) {
         setError(e.message);
-        console.error("Failed to fetch projects:", e);
+        console.error("Failed to fetch hostels:", e);
         setLoading(false);
       }
     };
 
-    fetchProjects();
+    fetchHostels();
   }, [refreshTrigger]); // Add refreshTrigger to dependency array to re-fetch when it changes
 
   useEffect(() => {
-    let filteredProjects: Project[] = [...allProjects];
+    let filteredHostels: Hostel[] = [...allHostels];
 
     // Apply Tab Filters
     const oneMonthAgo = new Date();
@@ -58,13 +59,13 @@ const ProjectGrid = ({ activeTab, filters, refreshTrigger }: ProjectGridProps) =
         break;
 
       case "Latest":
-        filteredProjects = filteredProjects
-          .filter((p) => new Date(p.createdAt) >= oneMonthAgo)
+        filteredHostels = filteredHostels
+          .filter((h) => new Date(h.createdAt) >= oneMonthAgo)
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
 
       case "Oldest":
-        filteredProjects = filteredProjects.sort(
+        filteredHostels = filteredHostels.sort(
           (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
         break;
@@ -72,9 +73,21 @@ const ProjectGrid = ({ activeTab, filters, refreshTrigger }: ProjectGridProps) =
       case "This Week":
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        filteredProjects = filteredProjects.filter(
-          (p) => new Date(p.createdAt) >= oneWeekAgo
+        filteredHostels = filteredHostels.filter(
+          (h) => new Date(h.createdAt) >= oneWeekAgo
         );
+        break;
+
+      case "Top Rated":
+        filteredHostels = filteredHostels
+          .filter((h) => h.averageRating && h.averageRating >= 4.0)
+          .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+        break;
+
+      case "Budget Friendly":
+        filteredHostels = filteredHostels
+          .filter((h) => h.priceRange && (h.priceRange.includes("$20") || h.priceRange.includes("$30") || h.priceRange.includes("$40")))
+          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         break;
     }
 
@@ -82,32 +95,32 @@ const ProjectGrid = ({ activeTab, filters, refreshTrigger }: ProjectGridProps) =
     if (Object.keys(filters).length > 0) {
       Object.entries(filters).forEach(([filterCategoryName, selectedOptionNames]) => {
         if (selectedOptionNames.length > 0) {
-          filteredProjects = filteredProjects.filter((project) => {
-            // Check if the project has the category being filtered
-            const projectCategory = project.categories?.find(
+          filteredHostels = filteredHostels.filter((hostel) => {
+            // Check if the hostel has the category being filtered
+            const hostelCategory = hostel.categories?.find(
               (cat) => cat.categoryName === filterCategoryName
             );
 
-            if (projectCategory) {
-              const isMatch = selectedOptionNames.includes(projectCategory.optionName);
+            if (hostelCategory) {
+              const isMatch = selectedOptionNames.includes(hostelCategory.optionName);
               
               // console.log(`Filtering by Category: ${filterCategoryName}`);
-              // console.log(`  Project Name: ${project.projectName}`);
-              // console.log(`  Project's Category Options:`, project.categories);
-              // console.log(`  Project's Option for ${filterCategoryName}: ${projectCategory.optionName}`);
+              // console.log(`  Hostel Name: ${hostel.hostelName}`);
+              // console.log(`  Hostel's Category Options:`, hostel.categories);
+              // console.log(`  Hostel's Option for ${filterCategoryName}: ${hostelCategory.optionName}`);
               // console.log(`  Selected Filter Options: ${JSON.stringify(selectedOptionNames)}`);
               // console.log(`  Is Match: ${isMatch}`);
 
               return isMatch;
             }
-            return false; // Project does not have this category, so it doesn't match the filter
+            return false; // Hostel does not have this category, so it doesn't match the filter
           });
         }
       });
     }
 
-    setProjects(filteredProjects);
-  }, [activeTab, filters, allProjects]);
+    setHostels(filteredHostels);
+  }, [activeTab, filters, allHostels]);
 
   if (loading) {
     return (
@@ -126,22 +139,22 @@ const ProjectGrid = ({ activeTab, filters, refreshTrigger }: ProjectGridProps) =
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-6 animate-fadeIn">
-        {projects.length > 0 ? (
-          projects.map((project, index) => (
+        {hostels.length > 0 ? (
+          hostels.map((hostel, index) => (
             <div
-              key={project.projectId || index}
+              key={hostel.hostelId || index}
               className="opacity-0 animate-slideUp"
               style={{ animationDelay: `${index * 0.1}s`, animationFillMode: "forwards" }}
             >
-              <ProjectCard project={project} />
+              <HostelCard hostel={hostel} />
             </div>
           ))
         ) : (
-          <p className="text-gray-500 text-center">No projects available.</p>
+          <p className="text-gray-500 text-center">No hostels available.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default ProjectGrid;
+export default HostelGrid;

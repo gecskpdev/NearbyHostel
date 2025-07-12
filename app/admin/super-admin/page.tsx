@@ -13,6 +13,9 @@ import {
 } from "firebase/firestore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AddAdmin, AdminList, RemoveAdmin, RemovedAdminsList } from "@/components/admin-components";
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { User } from 'lucide-react';
 
 export default function AdminPanel() {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -52,24 +55,30 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
-      <Tabs defaultValue="add">
-        <TabsList className="mb-4">
-          <TabsTrigger value="add">Add Admin</TabsTrigger>
-          <TabsTrigger value="list">List Admins</TabsTrigger>
-          <TabsTrigger value="remove">Remove Admin</TabsTrigger>
-        </TabsList>
-        <TabsContent value="add">
-          <AddAdmin />
-        </TabsContent>
-        <TabsContent value="list">
-          <AdminList />
-        </TabsContent>
-        <TabsContent value="remove">
-          <RemoveAdmin />
-        </TabsContent>
-      </Tabs>
+    <div className="flex flex-col items-center justify-center min-h-[80vh]">
+      <Card className="w-full max-w-2xl p-8 shadow-lg">
+        <div className="flex items-center gap-3 mb-6">
+          <User className="w-8 h-8 text-purple-600" />
+          <h1 className="text-2xl font-bold">Hostel Management Admin Panel</h1>
+          <Badge variant="secondary" className="ml-2">Superadmin</Badge>
+        </div>
+        <Tabs defaultValue="add">
+          <TabsList className="mb-4">
+            <TabsTrigger value="add">Add Admin</TabsTrigger>
+            <TabsTrigger value="list">List Admins</TabsTrigger>
+            <TabsTrigger value="remove">Remove Admin</TabsTrigger>
+          </TabsList>
+          <TabsContent value="add">
+            <AddAdmin />
+          </TabsContent>
+          <TabsContent value="list">
+            <AdminList />
+          </TabsContent>
+          <TabsContent value="remove">
+            <RemoveAdmin />
+          </TabsContent>
+        </Tabs>
+      </Card>
     </div>
   );
 } 

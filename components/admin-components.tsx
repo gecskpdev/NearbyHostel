@@ -9,6 +9,10 @@ import {
   getDocs,
   Timestamp,
 } from "firebase/firestore";
+import { Card } from './ui/card';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 
 export const AddAdmin = () => {
   const [email, setEmail] = useState("");
@@ -68,52 +72,52 @@ export const AddAdmin = () => {
   };
 
   return (
-    <div>
-      <input
+    <Card className="p-6 space-y-4 max-w-md">
+      <Input
         type="email"
         placeholder="Admin email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 w-full rounded mb-2"
+        className="mb-2"
       />
       <select
         value={role}
-        onChange={(e) => setRole(e.target.value as "admin" | "superadmin")}
+        onChange={(e) => setRole(e.target.value as 'admin' | 'superadmin')}
         className="border p-2 w-full rounded mb-2"
       >
         <option value="admin">Admin</option>
         <option value="superadmin">Superadmin</option>
       </select>
-
       {!confirming ? (
-        <button
+        <Button
           onClick={() => setConfirming(true)}
           disabled={loading || !email}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="w-full"
         >
           Add Admin
-        </button>
+        </Button>
       ) : (
-        <div className="space-x-4">
-          <button
+        <div className="flex gap-4">
+          <Button
             onClick={handleAdd}
             disabled={loading}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            variant="default"
+            className="flex-1"
           >
             Confirm Add
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setConfirming(false)}
             disabled={loading}
-            className="bg-gray-300 px-4 py-2 rounded"
+            variant="secondary"
+            className="flex-1"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       )}
-
-      {status && <p className="mt-2 text-sm">{status}</p>}
-    </div>
+      {status && <Badge className="mt-2">{status}</Badge>}
+    </Card>
   );
 };
 
@@ -144,26 +148,19 @@ export const AdminList = () => {
   }, []);
 
   return (
-    <div>
+    <div className="space-y-4">
       {admins.map((admin) => (
-        <div
+        <Card
           key={admin.id}
-          className="border rounded p-4 mb-2 shadow-sm bg-gray-50"
+          className="p-4 flex flex-col gap-2 shadow-sm bg-gray-50"
         >
-          <p>
-            <strong>Email:</strong> {admin.id}
-          </p>
-          <p>
-            <strong>Role:</strong> {admin.role}
-          </p>
-          <p>
-            <strong>Added By:</strong> {admin.addedBy}
-          </p>
-          <p>
-            <strong>Added At:</strong>{" "}
-            {admin.addedAt?.toDate().toLocaleString()}
-          </p>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Email:</span> {admin.id}
+            <Badge variant="outline" className="ml-2">{admin.role}</Badge>
+          </div>
+          <div className="text-sm text-gray-500">Added By: {admin.addedBy}</div>
+          <div className="text-sm text-gray-500">Added At: {admin.addedAt?.toDate().toLocaleString()}</div>
+        </Card>
       ))}
     </div>
   );
@@ -218,40 +215,43 @@ export const RemoveAdmin = () => {
   };
 
   return (
-    <div>
-      <input
+    <Card className="p-6 space-y-4 max-w-md">
+      <Input
         type="email"
         placeholder="Admin email to remove"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 w-full rounded mb-2"
+        className="mb-2"
       />
       {!confirming ? (
-        <button
+        <Button
           onClick={() => setConfirming(true)}
-          className="bg-red-600 text-white px-4 py-2 rounded"
+          variant="destructive"
+          className="w-full"
         >
           Remove Admin
-        </button>
+        </Button>
       ) : (
-        <div className="space-x-4">
-          <button
+        <div className="flex gap-4">
+          <Button
             onClick={handleRemove}
-            className="bg-red-600 text-white px-4 py-2 rounded"
+            variant="destructive"
+            className="flex-1"
           >
             Yes, Remove
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setConfirming(false)}
-            className="bg-gray-300 px-4 py-2 rounded"
+            variant="secondary"
+            className="flex-1"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       )}
-      {status && <p className="mt-2 text-sm">{status}</p>}
+      {status && <Badge className="mt-2">{status}</Badge>}
       <RemovedAdminsList />
-    </div>
+    </Card>
   );
 };
 
@@ -282,27 +282,21 @@ export const RemovedAdminsList = () => {
   }, []);
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-2">
       <h3 className="font-semibold mb-2">Removed Admins</h3>
       {removed.map((admin) => (
-        <div
+        <Card
           key={admin.id}
-          className="border rounded p-4 mb-2 shadow-sm bg-red-50"
+          className="p-4 flex flex-col gap-2 shadow-sm bg-red-50"
         >
-          <p>
-            <strong>Email:</strong> {admin.email}
-          </p>
-          <p>
-            <strong>Removed By:</strong> {admin.removedBy}
-          </p>
-          <p>
-            <strong>Role:</strong> {admin.roleAtRemoval}
-          </p>
-          <p>
-            <strong>Removed At:</strong>{" "}
-            {admin.removedAt?.toDate().toLocaleString()}
-          </p>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Email:</span> {admin.email}
+            <Badge variant="destructive" className="ml-2">Removed</Badge>
+          </div>
+          <div className="text-sm text-gray-500">Removed By: {admin.removedBy}</div>
+          <div className="text-sm text-gray-500">Role: {admin.roleAtRemoval}</div>
+          <div className="text-sm text-gray-500">Removed At: {admin.removedAt?.toDate().toLocaleString()}</div>
+        </Card>
       ))}
     </div>
   );
