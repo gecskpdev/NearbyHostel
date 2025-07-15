@@ -6,23 +6,26 @@
 
 ## 🚀 Features
 - 🏠 **Hostel Management** – Add, edit, and manage hostel details including name, address, and price.
+- 🖼️ **Image Management & Slider** – Upload multiple hostel images, displayed in a Swiper slider. Click any image to view it fullscreen in a high-quality modal/lightbox (powered by Cloudinary).
 - 🗂️ **Category Management** – Create and organize hostel categories for better filtering and search.
 - 📝 **Comment Moderation** – Admins can view, edit, report, and block user comments for a safe environment.
 - 🚫 **User Blocking & Reporting** – Block users or report inappropriate comments, with in-app notifications.
 - 🔒 **Access Control** – Secure admin and superadmin roles with persistent authentication.
-- 💡 **Modern UI** – Built with Shadcn UI components for a clean, responsive, and accessible experience.
+- 💡 **Modern UI** – Single-card-per-row layout, responsive Swiper image slider, and accessible fullscreen image viewing.
 
 ---
 
-## 📽️ Demo Video
-[![Watch the Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://codecompasss.github.io/project_archive/public/video/demowebsitevideo.mp4)
+## 🖼️ Image Storage & Display (Cloudinary)
+- Hostel images are uploaded to and served from [Cloudinary](https://cloudinary.com/), with high-quality transformations (`q_auto:best`).
+- All images are shown in a Swiper slider; click any image to view it fullscreen in a modal/lightbox.
+- You can customize Cloudinary transformations (quality, size, cropping) by editing the image URL or backend logic.
 
 ---
 
 ## 🛠️ Tech Stack
 - **Frontend:** Next.js, React, TypeScript, Tailwind CSS, Shadcn UI
 - **Backend:** Next.js API Routes, Firebase Firestore
-- **Email/Notifications:** (Email notifications have been removed; in-app notifications only)
+- **Image Storage:** Cloudinary (no Firebase Storage)
 - **Authentication:** Firebase Auth
 
 ---
@@ -36,24 +39,11 @@ This project was designed and developed solely by **Sooraj Krishna K P**.
 
 Absolutely! You can easily **reuse and customize** this project for your own hostel or organization:
 
-1. **Fork this repository**  
-   This lets you receive any future updates while keeping your own customizations.
-
-2. **Clone your fork locally**  
-   ```bash
-   git clone https://github.com/Sooraj-krishna/Nearby_hostels.git
-   ```
-
-3. **Update Branding**  
-   - Change the **name in the loading screen and navbar** to match your institution.  
-     This can be done in the **`components/` folder**.
-   - Look for `loadingScrenn.tsx`, `Navbar.tsx`, or similarly named files.
-
-4. **Edit Hostel Data**  
-   - All hostel and category information is managed via the admin panel. No need to edit JSON files directly.
-
-5. **Deploy**  
-   Deploy using Vercel, Netlify, or your preferred hosting provider.
+1. **Fork this repository**
+2. **Clone your fork locally**
+3. **Update Branding**
+4. **Edit Hostel Data**
+5. **Deploy**
 
 ---
 

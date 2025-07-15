@@ -8,6 +8,7 @@ This project has been converted from a project management system to a comprehens
 - **Add Hostels**: Only admins and super admins can add new hostels
 - **Hostel Information**: Complete hostel details including name, description, location (Google Maps link), contact info, and pricing
 - **Image Management**: Support for multiple hostel images with primary image designation
+- **Image Slider & Fullscreen View**: Hostel images are displayed in a modern Swiper slider. Click any image to view it fullscreen in a high-quality modal/lightbox.
 - **Categories & Filtering**: Dynamic categorization system for amenities, room types, location types, price ranges, and atmosphere
 
 ### ⭐ Ratings & Reviews
@@ -34,6 +35,13 @@ This project has been converted from a project management system to a comprehens
 
 Hostel images are now uploaded and stored using [Cloudinary](https://cloudinary.com/). The backend handles image uploads and stores the returned Cloudinary URLs in the database. **Firebase Storage is no longer used for images.**
 
+### Cloudinary Features
+- **High-Quality Images**: Images are displayed using Cloudinary's `q_auto:best` transformation for optimal quality.
+- **Image Slider**: All hostel images are shown in a Swiper slider, supporting multiple images per hostel.
+- **Fullscreen Modal/Lightbox**: Click any image to view it fullscreen in a modal for a better viewing experience.
+- **Responsive Design**: The slider and modal are fully responsive and accessible.
+- **Custom Transformations**: You can customize Cloudinary transformations (e.g., resizing, cropping, quality) by editing the image URL or backend logic.
+
 ### Cloudinary Setup
 1. **Create a Cloudinary account** at https://cloudinary.com/ (free tier is sufficient).
 2. **Get your credentials** from the Cloudinary dashboard:
@@ -51,6 +59,11 @@ Hostel images are now uploaded and stored using [Cloudinary](https://cloudinary.
    npm install cloudinary
    ```
 5. **No further setup is needed.** The backend API will handle all uploads and return the Cloudinary image URLs for use in the app.
+
+## UI Improvements
+- **Single Card Per Row**: Hostel cards are now displayed one per row for better readability.
+- **Modern Card/Grid Design**: The UI uses a clean, modern design with responsive layouts.
+- **Accessible Image Viewing**: All images are accessible and can be viewed fullscreen for better detail.
 
 ## Database Schema
 
