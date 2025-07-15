@@ -4,6 +4,7 @@ import HostelInteractionWrapper from './HostelInteractionWrapper';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import HostelImageSlider from '@/components/main/HostelImageSlider';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
@@ -21,18 +22,13 @@ export default async function HostelDetailsPage({ params }: { params: Promise<{ 
   const mainImage = hostel.images && hostel.images.length > 0 ? hostel.images[0].imageUrl : null;
 
   return (
-    <div className="max-w-4xl mx-auto p-0 md:p-6">
-      {/* Hero Section */}
-      <Card className="relative rounded-3xl overflow-hidden shadow-lg mb-8">
-        {mainImage ? (
-          <Avatar className="w-full h-64 rounded-3xl">
-            <AvatarImage src={mainImage} alt={hostel.hostelName} className="object-cover w-full h-64" />
-            <AvatarFallback className="w-full h-64 flex items-center justify-center text-4xl text-white font-bold bg-gradient-to-r from-blue-200 to-blue-400">
-              {hostel.hostelName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+    <div className="max-w-5xl mx-auto p-0 md:p-6">
+      {/* Hero Section with Image Slider */}
+      <Card className="relative rounded-3xl overflow-hidden shadow-lg mb-8 border-none">
+        {hostel.images && hostel.images.length > 0 ? (
+          <HostelImageSlider images={hostel.images} alt={hostel.hostelName} large />
         ) : (
-          <div className="w-full h-64 bg-gradient-to-r from-blue-200 to-blue-400 flex items-center justify-center text-4xl text-white font-bold">
+          <div className="w-full h-[60vh] md:h-[66vh] bg-gradient-to-r from-blue-200 to-blue-400 flex items-center justify-center text-4xl text-white font-bold rounded-3xl">
             {hostel.hostelName.charAt(0)}
           </div>
         )}

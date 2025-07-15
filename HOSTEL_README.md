@@ -30,11 +30,33 @@ This project has been converted from a project management system to a comprehens
 - **Role-based Access**: Only authorized users can add/edit hostels
 - **User Reviews**: Any authenticated user can rate and review hostels
 
+## Image Storage with Cloudinary
+
+Hostel images are now uploaded and stored using [Cloudinary](https://cloudinary.com/). The backend handles image uploads and stores the returned Cloudinary URLs in the database. **Firebase Storage is no longer used for images.**
+
+### Cloudinary Setup
+1. **Create a Cloudinary account** at https://cloudinary.com/ (free tier is sufficient).
+2. **Get your credentials** from the Cloudinary dashboard:
+   - Cloud name
+   - API Key
+   - API Secret
+3. **Add these to your `.env.local` file:**
+   ```env
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   ```
+4. **Install the Cloudinary SDK:**
+   ```bash
+   npm install cloudinary
+   ```
+5. **No further setup is needed.** The backend API will handle all uploads and return the Cloudinary image URLs for use in the app.
+
 ## Database Schema
 
 ### Core Tables
 - **hostels**: Main hostel information
-- **hostel_images**: Image management with primary image support
+- **hostel_images**: Image management with primary image support (stores Cloudinary URLs)
 - **ratings**: User ratings with multiple categories
 - **comments**: User reviews and feedback
 - **categories**: Dynamic category system

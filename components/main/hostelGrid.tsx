@@ -6,7 +6,7 @@ import { Hostel } from "@/types/project";
 import ProjectCardSkeleton from './hostelCardSkeleton'; // We'll rename this file later
 
 interface HostelGridProps {
-  activeTab: string;
+  activeTab: string;  
   filters: Record<string, string[]>; // Accept selected filters
   refreshTrigger?: boolean; // New prop to trigger re-fetch
 }
@@ -138,7 +138,7 @@ const HostelGrid = ({ activeTab, filters, refreshTrigger }: HostelGridProps) => 
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6 animate-fadeIn">
+      <div className="grid grid-cols-1 gap-8 animate-fadeIn">
         {hostels.length > 0 ? (
           hostels.map((hostel, index) => (
             <div
@@ -150,7 +150,7 @@ const HostelGrid = ({ activeTab, filters, refreshTrigger }: HostelGridProps) => 
             </div>
           ))
         ) : (
-          <p className="text-gray-500 text-center">No hostels available.</p>
+          <p className="text-gray-500 text-center col-span-full">No hostels available.</p>
         )}
       </div>
     </div>

@@ -22,9 +22,3 @@ export const firebaseApp: FirebaseApp =
 export const auth = getAuth(firebaseApp);
 export const firestore = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
-
-export async function uploadFileToFirebase(file: File, folder: string): Promise<string> {
-  const storageRef = ref(storage, `${folder}/${file.name}`);
-  const snapshot = await uploadBytes(storageRef, file);
-  return await getDownloadURL(snapshot.ref);
-}

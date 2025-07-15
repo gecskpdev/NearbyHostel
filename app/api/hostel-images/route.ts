@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../lib/db';
 import { hostelImages } from '../../../lib/schema';
 import { eq } from 'drizzle-orm';
+import { uploadImageToCloudinary } from '@/util/uploadImage';
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,19 +26,37 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { hostelId, imageUrl, imageType, isPrimary } = await req.json();
+    // Parse multipart/form-data
+    const formData = await req.formData();
+    const hostelId = formData.get('hostelId');
+    const imageType = formData.get('imageType') || 'general';
+    const isPrimary = formData.get('isPrimary') === 'true';
+    const file = formData.get('file');
+
+    if (!hostelId || !file || typeof file === 'string') {
+      return NextResponse.json({ message: 'hostelId and image file are required.' }, { status: 400 });
+    }
+
+    // Convert file to Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const filename = `${Date.now()}_${file.name}`;
+
+    // Upload to Cloudinary
+    const result: any = await uploadImageToCloudinary(buffer, filename);
+    const imageUrl = result.secure_url;
 
     // If this is a primary image, unset other primary images for this hostel
     if (isPrimary) {
       await db.update(hostelImages)
         .set({ isPrimary: false })
-        .where(eq(hostelImages.hostelId, hostelId));
+        .where(eq(hostelImages.hostelId, Number(hostelId)));
     }
 
     const [newImage] = await db.insert(hostelImages).values({
-      hostelId,
+      hostelId: Number(hostelId),
       imageUrl,
-      imageType: imageType || 'general',
+      imageType: imageType as string,
       isPrimary: isPrimary || false,
       uploadedAt: new Date(),
     }).returning();

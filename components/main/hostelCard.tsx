@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CalendarDays, MapPin, Star, Phone, Mail, Globe, DollarSign, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Hostel } from "@/types/project";
+import HostelImageSlider from './HostelImageSlider';
 
 interface HostelCardProps {
   hostel: Hostel;
@@ -28,9 +29,17 @@ export default function HostelCard({ hostel }: HostelCardProps) {
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform ${expanded ? "scale-105" : "hover:-translate-y-1"}`}
+      className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform ${expanded ? "scale-105" : "hover:-translate-y-1"} w-full`}
       onClick={toggleExpand}
     >
+      {/* Image Slider at the top */}
+      {hostel.images && hostel.images.length > 0 ? (
+        <HostelImageSlider images={hostel.images} alt={hostel.hostelName} />
+      ) : (
+        <div className="w-full h-48 bg-gradient-to-r from-blue-200 to-blue-400 flex items-center justify-center text-3xl text-white font-bold">
+          {hostel.hostelName.charAt(0)}
+        </div>
+      )}
       <div className="md:flex">
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 md:w-1/3 relative">
           {primaryImage && (

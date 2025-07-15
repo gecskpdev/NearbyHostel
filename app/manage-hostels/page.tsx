@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { uploadFileToFirebase } from '@/lib/firebase/config';
 import { auth, firestore } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { useUserSession } from '@/hook/use_user_session';
@@ -173,13 +172,25 @@ export default function ManageHostelsPage() {
     setSubmitError(null);
     try {
       const uploadedImageUrls: string[] = [];
-      for (const file of imageFiles) {
-        const url = await uploadFileToFirebase(file, 'hostel-images');
-        uploadedImageUrls.push(url);
-      }
       const hostelCategoryOptions = Object.entries(selectedOptions).map(([categoryName, optionName]) => ({ categoryName, optionName }));
       let hostelId = editingHostelId;
       if (editMode && editingHostelId) {
+        // Edit mode: upload images with existing hostelId
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          const formData = new FormData();
+          formData.append('hostelId', String(editingHostelId));
+          formData.append('file', file);
+          formData.append('imageType', 'general');
+          formData.append('isPrimary', String(existingImages.length + i === primaryImageIndex));
+          const res = await fetch('/api/hostel-images', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!res.ok) throw new Error('Failed to upload image');
+          const data = await res.json();
+          uploadedImageUrls.push(data.imageUrl);
+        }
         let hostelRes: Response;
         hostelRes = await fetch('/api/hostels', {
           method: 'PUT',
@@ -203,18 +214,7 @@ export default function ManageHostelsPage() {
         for (const id of removedImageIds) {
           await fetch(`/api/hostel-images?imageId=${id}`, { method: 'DELETE' });
         }
-        for (let i = 0; i < uploadedImageUrls.length; i++) {
-          await fetch('/api/hostel-images', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              hostelId: editingHostelId,
-              imageUrl: uploadedImageUrls[i],
-              imageType: 'general',
-              isPrimary: false,
-            }),
-          });
-        }
+        // Set primary image
         const allImages = [...existingImages, ...uploadedImageUrls.map((url, i) => ({ imageUrl: url, imageId: null, isPrimary: false, isNew: true, idx: i }))];
         for (let i = 0; i < allImages.length; i++) {
           const img = allImages[i];
@@ -243,6 +243,7 @@ export default function ManageHostelsPage() {
           }
         }
       } else {
+        // Create hostel first, then upload images with real hostelId
         let hostelRes: Response;
         hostelRes = await fetch('/api/hostels', {
           method: 'POST',
@@ -262,17 +263,19 @@ export default function ManageHostelsPage() {
         if (!hostelRes.ok) throw new Error('Failed to create hostel');
         let hostelData: any = await hostelRes.json();
         hostelId = hostelData.hostelId;
-        for (let i = 0; i < uploadedImageUrls.length; i++) {
-          await fetch('/api/hostel-images', {
+        // Now upload images with correct hostelId
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          const formData = new FormData();
+          formData.append('hostelId', String(hostelId));
+          formData.append('file', file);
+          formData.append('imageType', 'general');
+          formData.append('isPrimary', String(existingImages.length + i === primaryImageIndex));
+          const res = await fetch('/api/hostel-images', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              hostelId,
-              imageUrl: uploadedImageUrls[i],
-              imageType: 'general',
-              isPrimary: i === primaryImageIndex,
-            }),
+            body: formData,
           });
+          if (!res.ok) throw new Error('Failed to upload image');
         }
       }
       handleCloseModal();
