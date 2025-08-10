@@ -5,8 +5,6 @@ import {
   timestamp,
   integer,
   varchar,
-  primaryKey,
-  foreignKey,
   decimal,
   boolean,
 } from "drizzle-orm/pg-core";
@@ -87,3 +85,36 @@ export const hostelOptions = pgTable("hostel_options", {
     optionId: integer("option_id").references(() => categoryOptionValues.optionId).notNull(),
   });
   
+// -------------------- Projects --------------------
+export const projects = pgTable("projects", {
+  projectId: serial("project_id").primaryKey(),
+  projectName: varchar("project_name", { length: 255 }),
+  projectDescription: text("project_description"),
+  projectLink: varchar("project_link", { length: 255 }),
+  createdAt: timestamp("created_at"),
+  // Add other columns if needed
+});
+
+// -------------------- Team Members --------------------
+export const teamMembers = pgTable("team_members", {
+  memberId: serial("member_id").primaryKey(),
+  projectId: integer("project_id")
+    .references(() => projects.projectId)
+    .notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  linkedin: varchar("linkedin", { length: 255 }),
+});
+
+// -------------------- Project Options --------------------
+export const projectOptions = pgTable("project_options", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id")
+    .references(() => projects.projectId)
+    .notNull(),
+  categoryId: integer("category_id")
+    .references(() => categories.categoryId)
+    .notNull(),
+  optionId: integer("option_id")
+    .references(() => categoryOptionValues.optionId)
+    .notNull(),
+});

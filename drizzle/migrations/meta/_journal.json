@@ -57,6 +57,13 @@
       "when": 1752155074250,
       "tag": "0007_icy_toro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1754832968169,
+      "tag": "0008_slim_star_brand",
+      "breakpoints": true
     }
   ]
 }
